@@ -104,11 +104,11 @@ public class VistaLey extends JFrame{
 		return txtField.getText();
 	}
 
-	public int showOption(String message) {
+	public int mostrarOpciones(String message) {
 		return JOptionPane.showConfirmDialog(null, message, "Advertencia", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 	}
 	
-	public int showMessageOption(String type, String message) {
+	public int mostrarMensaje(String type, String message) {
 		if(type.equals("warning")) {
 			return JOptionPane.showConfirmDialog(null, message, "Advertencia", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
 		}else {
@@ -117,8 +117,8 @@ public class VistaLey extends JFrame{
 		
 	}
 	
-	public void crearDetalle(ArrayList<Object[]> data, int report) {
-		new VistaDetalleLey(data, report);
+	public void crearDetalle(ArrayList<Object[]> data, Object[] columns, String report) {
+		new VistaDetalleLey(data, columns, report);
 	}
 	
 	public void activarDesactivarBotones(boolean flag) {

@@ -95,6 +95,11 @@ public class ModeloLey {
 	public Producto[][] getData(){
 		return data;
 	}
+	
+	public boolean dataIsNull() {
+		return data == null; 
+	}
+	
 	public ArrayList<Object[]> getDataToReport1(){
 		ArrayList<Object[]> list = new ArrayList<Object[]>();
 		int entrada = 0, salida = 0;
