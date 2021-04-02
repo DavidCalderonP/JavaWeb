@@ -110,7 +110,7 @@ public class ModeloLey {
 				
 				entrada += data[i][j].getCantEntrada();
 				salida += data[i][j].getCantidadSalida();
-				list.add(new Object[] {(j+1),data[i][j].getCantInicial(), data[i][j].getCantEntrada(), data[i][j].getCantidadSalida(), data[i][j].getCantidadFinal()});
+				list.add(new Object[] {(j+1),data[i][j].getCantInicial(), data[i][j].getCantEntrada(), data[i][j].getCantidadSalida(), data[i][j].getCantidadFinal()});     
 			}
 			list.add(new Object[] {});
 			list.add(new Object[] {"Total:","",entrada, salida});
