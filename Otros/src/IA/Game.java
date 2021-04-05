@@ -1,10 +1,9 @@
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    package Busquedas;
+package Busquedas;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import javax.swing.plaf.synth.SynthSeparatorUI;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class Juego {
 
@@ -20,19 +19,29 @@ public class Juego {
 				{0,4,5},
 				{7,8,6}
 		};
-
+		/*
+		amplitud = 1
+		profundidad = 2
+		 */
 		Nodo inicial = new Nodo(estadoincial);
-		Nodo sol = buscarSolucion(inicial, estadofinal);
+		//Nodo resuelto = buscarSolucionPorAmplitud(inicial, estadofinal);
+		//Nodo resuelto = buscarSolucionPorProfundidad(inicial, estadofinal);
+		Nodo resuelto = buscarSolucionPorAEstrella(inicial, estadofinal);
 
-		while(sol.padre!=null) {
-			imprimirEstado(sol.getEstado());
-			System.out.println("------------------------");
-			sol = sol.padre;
-		}
+		verSolucion(resuelto);
 		imprimirEstado(estadoincial);
 	}
+	private static void verSolucion(Nodo solucion) {
+		while(solucion.padre!=null) {
+			imprimirEstado(solucion.getEstado());
+			System.out.println("------------------------");
+			solucion = solucion.padre;
+		}
 
-	public static Nodo buscarSolucion(Nodo inicio, int[][] solucion) {
+	}
+	//abiertos.add(0, hijo); //Esta linea es para hacer recorrido en profundidad
+
+	public static Nodo buscarSolucionPorAmplitud(Nodo inicio, int[][] solucion) {
 		ArrayList<Nodo> abiertos = new ArrayList<Nodo>();
 		abiertos.add(inicio);
 		int cont = 0;
@@ -42,10 +51,12 @@ public class Juego {
 			System.out.println("#################################");
 			for(Nodo n : visitados) {
 				imprimirEstado(n.getEstado());
+				System.out.println("Costo de este nodo: " + n.getCosto());
 				System.out.println("---------------");
 			}
 			System.out.println("#################################");
 			Nodo revisar = abiertos.remove(0);
+			revisar.setCosto(calcularCosto(revisar.getEstado(), solucion));
 			imprimirEstado(revisar.getEstado());
 			int[]  pcero = ubicarPosicionCero(revisar.getEstado());
 			System.out.println("Iteracion # " + ++cont);
@@ -59,48 +70,235 @@ public class Juego {
 			visitados.add(revisar);
 			if(pcero[0]!=0) {
 				Nodo hijo = new Nodo(clonar(revisar.getEstado()));
+				hijo.setCosto(calcularCosto(hijo.getEstado(), solucion));
 				int arriba = hijo.getEstado()[pcero[0]-1][pcero[1]];
 				hijo.getEstado()[pcero[0]][pcero[1]] = arriba;
 				hijo.getEstado()[pcero[0]-1][pcero[1]] = 0;
 				if(!estaEnVisitados(visitados, hijo))
-					//abiertos.add(hijo); //Esta linea es para hacer recorrido em amplitud
-					abiertos.add(0, hijo); //Esta linea es para hacer recorrido en profundidad
+					abiertos.add(hijo); //Esta linea es para hacer recorrido em amplitud
+
 				hijos.add(hijo);
 			}
 			if(pcero[0]!=2) {
 				Nodo hijo = new Nodo(clonar(revisar.getEstado()));
+				hijo.setCosto(calcularCosto(hijo.getEstado(), solucion));
 				int abajo = hijo.getEstado()[pcero[0]+1][pcero[1]];
 				hijo.getEstado()[pcero[0]][pcero[1]] = abajo;
 				hijo.getEstado()[pcero[0]+1][pcero[1]] = 0;
 				if(!estaEnVisitados(visitados, hijo))
-					//abiertos.add(hijo);
-					abiertos.add(0, hijo);
+					abiertos.add(hijo); //Esta linea es para hacer recorrido em amplitud
+
 				hijos.add(hijo);
 			}
 			if(pcero[1]!=0) {
 				Nodo hijo = new Nodo(clonar(revisar.getEstado()));
+				hijo.setCosto(calcularCosto(hijo.getEstado(), solucion));
 				int izq = hijo.getEstado()[pcero[0]][pcero[1]-1];
 				hijo.getEstado()[pcero[0]][pcero[1]] = izq;
 				hijo.getEstado()[pcero[0]][pcero[1]-1] = 0;
 				if(!estaEnVisitados(visitados, hijo))
-					//abiertos.add(hijo);
-					abiertos.add(0, hijo);
+					abiertos.add(hijo); //Esta linea es para hacer recorrido em amplitud
+
 				hijos.add(hijo);
 			}
 			if(pcero[1]!=2) {
 				Nodo hijo = new Nodo(clonar(revisar.getEstado()));
+				hijo.setCosto(calcularCosto(hijo.getEstado(), solucion));
 				int der = hijo.getEstado()[pcero[0]][pcero[1]+1];
 				hijo.getEstado()[pcero[0]][pcero[1]] = der;
 				hijo.getEstado()[pcero[0]][pcero[1]+1] = 0;
 				if(!estaEnVisitados(visitados, hijo))
-					//abiertos.add(hijo);
-					abiertos.add(0, hijo);
+					abiertos.add(hijo); //Esta linea es para hacer recorrido em amplitud
 				hijos.add(hijo);
 			}
 			revisar.setHijos(hijos);
 		}
 		return null;
 
+	}
+
+	public static Nodo buscarSolucionPorProfundidad(Nodo inicio, int[][] solucion) {
+		ArrayList<Nodo> abiertos = new ArrayList<Nodo>();
+		abiertos.add(inicio);
+		int cont = 0;
+		ArrayList<Nodo> visitados = new ArrayList<Nodo>();
+		while(abiertos.size()!=0) {
+			System.out.println("Visitados");
+			System.out.println("#################################");
+			for(Nodo n : visitados) {
+				imprimirEstado(n.getEstado());
+				System.out.println("Costo de este nodo: " + n.getCosto());
+				System.out.println("---------------");
+			}
+			System.out.println("#################################");
+			Nodo revisar = abiertos.remove(0);
+			revisar.setCosto(calcularCosto(revisar.getEstado(), solucion));
+			imprimirEstado(revisar.getEstado());
+			int[]  pcero = ubicarPosicionCero(revisar.getEstado());
+			System.out.println("Iteracion # " + ++cont);
+			if(Arrays.deepEquals(revisar.getEstado(), solucion)) {
+				System.out.println("***** SOLUCION ENCONTRADA *****");
+				return revisar;
+
+			}
+
+			ArrayList<Nodo> hijos = new ArrayList<Nodo>();
+			visitados.add(revisar);
+			if(pcero[0]!=0) {
+				Nodo hijo = new Nodo(clonar(revisar.getEstado()));
+				hijo.setCosto(calcularCosto(hijo.getEstado(), solucion));
+				int arriba = hijo.getEstado()[pcero[0]-1][pcero[1]];
+				hijo.getEstado()[pcero[0]][pcero[1]] = arriba;
+				hijo.getEstado()[pcero[0]-1][pcero[1]] = 0;
+				if(!estaEnVisitados(visitados, hijo))
+					abiertos.add(0, hijo); //Esta linea es para hacer recorrido en profundidad
+
+				hijos.add(hijo);
+			}
+			if(pcero[0]!=2) {
+				Nodo hijo = new Nodo(clonar(revisar.getEstado()));
+				hijo.setCosto(calcularCosto(hijo.getEstado(), solucion));
+				int abajo = hijo.getEstado()[pcero[0]+1][pcero[1]];
+				hijo.getEstado()[pcero[0]][pcero[1]] = abajo;
+				hijo.getEstado()[pcero[0]+1][pcero[1]] = 0;
+				if(!estaEnVisitados(visitados, hijo))
+					abiertos.add(0, hijo); //Esta linea es para hacer recorrido en profundidad
+
+				hijos.add(hijo);
+			}
+			if(pcero[1]!=0) {
+				Nodo hijo = new Nodo(clonar(revisar.getEstado()));
+				hijo.setCosto(calcularCosto(hijo.getEstado(), solucion));
+				int izq = hijo.getEstado()[pcero[0]][pcero[1]-1];
+				hijo.getEstado()[pcero[0]][pcero[1]] = izq;
+				hijo.getEstado()[pcero[0]][pcero[1]-1] = 0;
+				if(!estaEnVisitados(visitados, hijo))
+					abiertos.add(0, hijo); //Esta linea es para hacer recorrido en profundidad
+
+				hijos.add(hijo);
+			}
+			if(pcero[1]!=2) {
+				Nodo hijo = new Nodo(clonar(revisar.getEstado()));
+				hijo.setCosto(calcularCosto(hijo.getEstado(), solucion));
+				int der = hijo.getEstado()[pcero[0]][pcero[1]+1];
+				hijo.getEstado()[pcero[0]][pcero[1]] = der;
+				hijo.getEstado()[pcero[0]][pcero[1]+1] = 0;
+				if(!estaEnVisitados(visitados, hijo))
+					abiertos.add(0, hijo); //Esta linea es para hacer recorrido en profundidad
+				hijos.add(hijo);
+			}
+			revisar.setHijos(hijos);
+		}
+		return null;
+
+	}
+
+	public static Nodo buscarSolucionPorAEstrella(Nodo inicio, int[][] solucion){
+		ArrayList<Nodo> abiertos = new ArrayList<Nodo>();
+		abiertos.add(inicio);
+		int cont = 0;
+		ArrayList<Nodo> visitados = new ArrayList<Nodo>();
+		while(abiertos.size()!=0) {
+			System.out.println("Visitados");
+			System.out.println("#################################");
+			for(Nodo n : visitados) {
+				imprimirEstado(n.getEstado());
+				System.out.println("Costo de este nodo: " + n.getCosto());
+				System.out.println("---------------");
+			}
+			System.out.println("#################################");
+			Nodo revisar = abiertos.remove(0);
+			revisar.setCosto(calcularCosto(revisar.getEstado(), solucion));
+			imprimirEstado(revisar.getEstado());
+			int[]  pcero = ubicarPosicionCero(revisar.getEstado());
+			System.out.println("Iteracion # " + ++cont);
+			if(Arrays.deepEquals(revisar.getEstado(), solucion)) {
+				System.out.println("***** SOLUCION ENCONTRADA *****");
+				return revisar;
+
+			}
+
+			ArrayList<Nodo> hijos = new ArrayList<Nodo>();
+			ArrayList<Nodo> auxabiertos = new ArrayList<Nodo>();
+			visitados.add(revisar);
+			if(pcero[0]!=0) {
+				Nodo hijo = new Nodo(clonar(revisar.getEstado()));
+				//hijo.setCosto(calcularCosto(hijo.getEstado(), solucion));
+				int arriba = hijo.getEstado()[pcero[0]-1][pcero[1]];
+				hijo.getEstado()[pcero[0]][pcero[1]] = arriba;
+				hijo.getEstado()[pcero[0]-1][pcero[1]] = 0;
+				if(!estaEnVisitados(visitados, hijo)) {
+					auxabiertos.add(hijo);
+				}
+				//abiertos.add(hijo); //Esta linea es para hacer recorrido em amplitud
+
+				hijos.add(hijo);
+			}
+			if(pcero[0]!=2) {
+				Nodo hijo = new Nodo(clonar(revisar.getEstado()));
+				//hijo.setCosto(calcularCosto(hijo.getEstado(), solucion));
+				int abajo = hijo.getEstado()[pcero[0]+1][pcero[1]];
+				hijo.getEstado()[pcero[0]][pcero[1]] = abajo;
+				hijo.getEstado()[pcero[0]+1][pcero[1]] = 0;
+				if(!estaEnVisitados(visitados, hijo)) {
+					auxabiertos.add(hijo);
+				}
+				//abiertos.add(hijo); //Esta linea es para hacer recorrido em amplitud
+
+				hijos.add(hijo);
+			}
+			if(pcero[1]!=0) {
+				Nodo hijo = new Nodo(clonar(revisar.getEstado()));
+				//hijo.setCosto(calcularCosto(hijo.getEstado(), solucion));
+				int izq = hijo.getEstado()[pcero[0]][pcero[1]-1];
+				hijo.getEstado()[pcero[0]][pcero[1]] = izq;
+				hijo.getEstado()[pcero[0]][pcero[1]-1] = 0;
+				if(!estaEnVisitados(visitados, hijo)) {
+					auxabiertos.add(hijo);
+				}
+				//abiertos.add(hijo); //Esta linea es para hacer recorrido em amplitud
+
+				hijos.add(hijo);
+			}
+			if(pcero[1]!=2) {
+				Nodo hijo = new Nodo(clonar(revisar.getEstado()));
+				//hijo.setCosto(calcularCosto(hijo.getEstado(), solucion));
+				int der = hijo.getEstado()[pcero[0]][pcero[1]+1];
+				hijo.getEstado()[pcero[0]][pcero[1]] = der;
+				hijo.getEstado()[pcero[0]][pcero[1]+1] = 0;
+				if(!estaEnVisitados(visitados, hijo)) {
+
+					auxabiertos.add(hijo);
+				}
+				//abiertos.add(hijo); //Esta linea es para hacer recorrido em amplitud
+				hijos.add(hijo);
+			}
+			//Collections.sort(hijos, (x, y) -> x.getCosto() - y.getCosto());
+
+			System.out.println("IMPRIMIENDO LOS AUXILIARES");
+			for(Nodo nodo : auxabiertos) {
+				imprimirEstado(nodo.getEstado());
+				nodo.setCosto(calcularCosto(nodo.getEstado(), solucion));
+				System.out.println(nodo.getCosto());
+			}
+			Collections.sort(auxabiertos, (x, y) -> x.getCosto() - y.getCosto());
+			abiertos.add(auxabiertos.remove(0));
+			auxabiertos.clear();
+			revisar.setHijos(hijos);
+		}
+		return null;
+	}
+
+
+	private static int calcularCosto(int[][] estado, int[][] solucion) {
+		int match = 0;
+		for(int i = 0 ; i < estado.length ; i++) {
+			for(int j = 0 ; j < estado.length ; j++ ) {
+				if(estado[i][j]!=solucion[i][j])
+					match++;
+			}
+		}
+		return match;
 	}
 
 	private static boolean estaEnVisitados(ArrayList<Nodo> visitados, Nodo hijo) {
@@ -147,4 +345,3 @@ public class Juego {
 	}
 
 }
-                                                                                                               

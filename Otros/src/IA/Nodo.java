@@ -1,4 +1,4 @@
-package IA;
+package Busquedas;
 
 import java.util.ArrayList;
 
@@ -6,12 +6,22 @@ public class Nodo {
 	int[][] estado;
 	ArrayList<Nodo> hijos = new ArrayList<Nodo>();
 	Nodo padre;
-	
+	int costo;
+
 	public Nodo(int[][] estado) {
 		this.estado = estado;
 		hijos = null;
 		padre = null;
-		
+		costo = 0;
+
+	}
+
+	public int getCosto() {
+		return costo;
+	}
+
+	public void setCosto(int costo) {
+		this.costo = costo;
 	}
 
 	public int[][] getEstado() {
@@ -41,5 +51,5 @@ public class Nodo {
 	public void setPadre(Nodo padre) {
 		this.padre = padre;
 	}
-	
+
 }
